@@ -3,8 +3,7 @@
 This script allows user to run terraform command for a specific file.
 
 Usage:
-    python -m terraform_target.main --repo-dir=<absolute path to repo> --tf-file=<tf file for terraform to action> \
-    --action=<plan/apply/destroy> --env=<env> --env-id=<env-id>
+    python -m terraform_target.main --tf-file=<tf file for terraform to action> --action=<plan/apply/destroy> --env=<env> --env-id=<env-id>
 """
 
 import os

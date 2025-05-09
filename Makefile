@@ -1,4 +1,4 @@
-.PHONY: build-venv activate-venv terraform-target build clean
+.PHONY: build-venv activate-venv terraform-target build clean install uninstall
 
 build-venv:
 	@pipenv sync --dev

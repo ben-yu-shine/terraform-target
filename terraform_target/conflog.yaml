@@ -1,0 +1,5 @@
+---
+handlers: "stream"
+datefmt: "%Y-%m-%dT%H:%M:%S%Z"
+format: "Terraform Target local %(asctime)s %(levelname)s %(message)s"
+level: "info"

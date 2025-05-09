@@ -1,0 +1,22 @@
+[build-system]
+requires = [
+  "setuptools >= 61.0",
+  "conflog"
+]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+terraform_target = ["*", "*.yaml"]
+
+[project]
+name = "terraform-target"
+version = "0.10.0"
+description = "A wrapper of terraform to plan/apply/destroy resources base on a specific file"
+readme = "README.md"
+
+dependencies = [
+  "conflog"
+]
+
+[project.scripts]
+terraform-target = "terraform_target.main:main"

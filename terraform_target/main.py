@@ -3,7 +3,7 @@
 This script allows user to run terraform command for a specific file.
 
 Usage:
-    python -m terraform_target.main --tf-file=<tf file for terraform to action> --action=<plan/apply/destroy> --env=<env> --env-id=<env-id>
+    python -m terraform_target.main --tf-files=<tf files for terraform to action> --action=<plan/apply/destroy> --env=<env> --env-id=<env-id>
 """
 
 import os
@@ -18,34 +18,39 @@ logger = cfl.get_logger("terraform_target")
 REPO_DIR = os.getcwd()
 
 
-def construct_tf_target(tf_file: str) -> str:
+def construct_tf_target(tf_files: str) -> str:
     """
-    :param tf_file: Target tf file to run terraform cmd against to
+    :param tf_files: Target tf files to run terraform cmd against to
     :return tf_target: Target resource string
     """
     tf_resources = []
-    try:
-        tf_file_path = f"{REPO_DIR}/terraform/{tf_file}"
-        with open(tf_file_path, "r", encoding="utf-8") as f:
-            tf_content = f.read()
-            tf_resource_pattern = re.compile(r'resource\s+"([^"]+)"\s+"([^"]+)"\s+\{')
-            logger.info(f"Identifying resource blocks in {tf_file_path}")
-            for match in tf_resource_pattern.finditer(tf_content):
-                resource_type = match.group(1)
-                resource_name = match.group(2)
-                tf_resources.append(f"-target={resource_type}.{resource_name}")
+    tf_file_list = tf_files.split(",")
+    for tf_file in tf_file_list:
+        try:
+            tf_file_path = f"{REPO_DIR}/terraform/{tf_file}"
+            with open(tf_file_path, "r", encoding="utf-8") as f:
+                tf_content = f.read()
+                tf_resource_pattern = re.compile(
+                    r'resource\s+"([^"]+)"\s+"([^"]+)"\s+\{'
+                )
+                logger.info(f"Identifying resource blocks in {tf_file_path}")
+                for match in tf_resource_pattern.finditer(tf_content):
+                    resource_type = match.group(1)
+                    resource_name = match.group(2)
+                    tf_resources.append(f"-target={resource_type}.{resource_name}")
 
-            logger.info(f"Identifying module blocks in {tf_file_path}")
-            tf_module_pattern = re.compile(r'module\s+"([^"]+)"\s+\{')
-            for match in tf_module_pattern.finditer(tf_content):
-                module_name = match.group(1)
-                tf_resources.append(f"-target=module.{module_name}")
+                logger.info(f"Identifying module blocks in {tf_file_path}")
+                tf_module_pattern = re.compile(r'module\s+"([^"]+)"\s+\{')
+                for match in tf_module_pattern.finditer(tf_content):
+                    module_name = match.group(1)
+                    tf_resources.append(f"-target=module.{module_name}")
 
-            tf_target = " ".join(tf_resources)
-            return tf_target
-    except FileNotFoundError:
-        logger.error(f"Error: File not found at {tf_file_path}")
-        raise
+        except FileNotFoundError:
+            logger.error(f"Error: File not found at {tf_file_path}")
+            raise
+
+    tf_target = " ".join(tf_resources)
+    return tf_target
 
 
 def get_repo_info(env: str) -> tuple[str, str]:
@@ -75,7 +80,7 @@ def get_repo_info(env: str) -> tuple[str, str]:
     except FileNotFoundError:
         logger.error(f"Error: File not found at {REPO_DIR}/config/{env}.tfvars")
         raise
-    return repo_version, aws_profile # pylint: disable=E0606
+    return repo_version, aws_profile  # pylint: disable=E0606
 
 
 def exec_tf_cmd(tf_cmd: str, aws_profile: str) -> None:
@@ -100,10 +105,10 @@ def main():
         description="This is a script to run terraform command against a specific file"
     )
     parser.add_argument(
-        "--tf-file",
+        "--tf-files",
         type=str,
         required=True,
-        help="Tf file to run terraform command against.",
+        help="Tf files to run terraform command against.",
     )
     parser.add_argument("--action", type=str, required=True, help="Terraform action")
     parser.add_argument("--env", type=str, required=True, help="Target ENV")
@@ -111,7 +116,7 @@ def main():
     args = parser.parse_args()
 
     version, aws_profile = get_repo_info(env=args.env)
-    tf_target = construct_tf_target(tf_file=args.tf_file)
+    tf_target = construct_tf_target(tf_files=args.tf_files)
     tf_cmd = f"terraform -chdir=terraform {args.action} -var-file=../config/{args.env}.tfvars -var=env_id={args.env_id} -var=app_version={version} {tf_target}"
     exec_tf_cmd(tf_cmd=tf_cmd, aws_profile=aws_profile)
 

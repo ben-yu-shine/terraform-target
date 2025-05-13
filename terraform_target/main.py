@@ -102,17 +102,17 @@ def main():
     The main entry point for the script.
     """
     parser = argparse.ArgumentParser(
-        description="This is a script to run terraform command against a specific file"
+        description="This is a script to run terraform command for selected tf files"
     )
     parser.add_argument(
-        "--tf-files",
+        "-f", "--tf-files",
         type=str,
         required=True,
-        help="Tf files to run terraform command against.",
+        help="Target tf files to run terraform command with.",
     )
-    parser.add_argument("--action", type=str, required=True, help="Terraform action")
-    parser.add_argument("--env", type=str, required=True, help="Target ENV")
-    parser.add_argument("--env-id", type=str, required=True, help="Target ENV_ID")
+    parser.add_argument("-a", "--action", type=str, required=True, help="Terraform action")
+    parser.add_argument("-e", "--env", type=str, required=True, help="Target ENV")
+    parser.add_argument("-i", "--env-id", type=str, required=True, help="Target ENV_ID")
     args = parser.parse_args()
 
     version, aws_profile = get_repo_info(env=args.env)

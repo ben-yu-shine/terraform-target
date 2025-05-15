@@ -11,13 +11,7 @@ A command-line utility to simplify running Terraform commands against a single T
  
 ## Purpose
  
-When working with large Terraform projects, you might want to apply or plan changes for resources defined in a specific file without affecting or processing the entire configuration. `terraform-target` allows you to do just that by intelligently identifying resources within the specified file and using Terraform's `-target` option.
- 
-This tool is particularly useful for:
-* Making granular changes in a complex environment.
-* Refactoring parts of your infrastructure piece by piece.
-* Speeding up development workflows by focusing only on relevant resources.
-* Applying hotfixes to specific resources.
+When working with large Terraform projects, you might want to apply or plan changes for resources defined in a specific file without affecting or processing the entire configuration. `terraform-target` allows you to apply resources within the specified file and using Terraform's `-target` option.
  
 ## Prerequisites
  

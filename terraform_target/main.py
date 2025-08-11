@@ -62,8 +62,12 @@ def get_repo_info(env: str) -> tuple[str, str]:
     """
     try:
         with open(f"{REPO_DIR}/config/info.yaml", "r", encoding="utf-8") as f:
-            version_info = f.readline().strip()
-            repo_version = version_info.rsplit(": ", 1)[1]
+            repo_version = ''
+            for line in f:
+                version_info = line.split(':', 1)
+                if len(version_info) > 1:
+                    repo_version = version_info[1].strip()
+                    break
         logger.info(f"Current version: {repo_version}")
     except FileNotFoundError:
         logger.error(f"Error: File not found at {REPO_DIR}/config/info.yaml")
